@@ -27,6 +27,7 @@ case "$1" in
         rmdir /android
         rmdir /userdata
         rmdir /var/lib/lxc/android/rootfs
+        rmdir /var/lib/lxc/android/overrides
         for link in cache data factory firmware persist system vendor; do
             rm "/$link"
         done

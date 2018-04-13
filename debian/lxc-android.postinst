@@ -25,6 +25,7 @@ case "$1" in
         mkdir -p /android
         mkdir -p /userdata
         mkdir -p /var/lib/lxc/android/rootfs
+        mkdir -p /var/lib/lxc/android/overrides
         for link in cache data factory firmware persist system vendor; do
             ln -sf "/android/$link" "/$link"
         done
