@@ -1,0 +1,60 @@
+From 72440235696a0785267a8947edc2424b9dfba5ab Mon Sep 17 00:00:00 2001
+From: JBBgameich <jbbgameich@gmail.com>
+Date: Tue, 3 Oct 2017 19:48:32 +0100
+Subject: [PATCH 1/2] Removal of adbd
+
+---
+ lib/systemd/system/adbd.service      | 15 ---------------
+ usr/lib/android-tools-adbd/pre-start | 18 ------------------
+ 2 files changed, 33 deletions(-)
+ delete mode 100644 lib/systemd/system/adbd.service
+ delete mode 100755 usr/lib/android-tools-adbd/pre-start
+
+diff --git a/lib/systemd/system/adbd.service b/lib/systemd/system/adbd.service
+deleted file mode 100644
+index e0d0a22..0000000
+--- a/lib/systemd/system/adbd.service
++++ /dev/null
+@@ -1,15 +0,0 @@
+-[Unit]
+-Description=adbd
+-Wants=local-fs.target
+-After=local-fs.target lxc@android.service systemd-udevd.service
+-
+-[Service]
+-Type=simple
+-Restart=on-failure
+-SuccessExitStatus=0 127
+-ExecStartPre=/usr/lib/android-tools-adbd/pre-start
+-ExecStart=/usr/bin/adbd
+-ExecStopPost=/usr/bin/unlink /dev/socket/adbd
+-
+-[Install]
+-WantedBy=multi-user.target
+diff --git a/usr/lib/android-tools-adbd/pre-start b/usr/lib/android-tools-adbd/pre-start
+deleted file mode 100755
+index 8fd3890..0000000
+--- a/usr/lib/android-tools-adbd/pre-start
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#!/bin/bash
+-
+-if [ -d /sys/class/android_usb ]; then
+-    if [ -d /sys/class/android_usb/android0/f_ffs ] && [ -n "$(cat /sys/class/android_usb/android0/f_ffs/aliases)" ]; then
+-        if ! $(mount|grep -q ^adb); then
+-        # some devices use the functionfs (i.e. manta)
+-        # we need to mount it to keep adb working
+-        mkdir -p /dev/usb-ffs/adb
+-        mount -t functionfs adb /dev/usb-ffs/adb || true
+-        fi
+-    fi
+-fi
+-
+-echo 0 >/sys/class/android_usb/android0/enable
+-echo -n 18d1 >/sys/class/android_usb/android0/idVendor
+-echo -n D002 >/sys/class/android_usb/android0/idProduct
+-echo -n adb >/sys/class/android_usb/android0/functions
+-echo 1 >/sys/class/android_usb/android0/enable
+-- 
+2.17.0
+
